@@ -1,0 +1,12 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+.app{padding:16px}
+.header{display:flex;justify-content:space-between;align-items:center}
+.board{display:flex;gap:12px;margin-top:16px}
+.column{flex:1;background:#f4f4f4;padding:8px;border-radius:6px;min-height:300px}
+.card{background:white;padding:8px;margin:8px 0;border-radius:4px;cursor:grab}
+.button{padding:6px 10px;border:none;background:#007bff;color:white;border-radius:4px}
+.form{display:flex;gap:8px}
