@@ -1,0 +1,13 @@
+version: "3.8"
+services:
+  api:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+  # example external DB service (optional)
+  mongo:
+    image: mongo:6
+    ports:
+      - "27017:27017"
