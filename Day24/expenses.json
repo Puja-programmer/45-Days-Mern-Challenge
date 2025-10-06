@@ -1,0 +1,5 @@
+[
+  {"id":1,"name":"Groceries","amount":500,"category":"Food","date":"2025-10-01T00:00:00.000Z"},
+  {"id":2,"name":"Bus Ticket","amount":100,"category":"Travel","date":"2025-10-03T00:00:00.000Z"},
+  {"id":3,"name":"Electricity Bill","amount":1200,"category":"Bills","date":"2025-10-05T00:00:00.000Z"}
+]

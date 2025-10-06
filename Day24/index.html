@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Expense Tracker Challenge - Data Integration</title>
+<script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+<style>
+body { 
+  font-family: Arial, sans-serif;
+   margin:0; background:#f0f2f5;
+  }
+.container {
+   max-width:900px; margin:20px auto; padding:20px; 
+   background:#fff;
+   border-radius:12px; 
+   box-shadow:0 4px 6px rgba(0,0,0,0.1);
+  }
+h1 { text-align:center;}
+form { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px;}
+input, select, button { padding:10px; font-size:16px; border-radius:6px; border:1px solid #ccc; flex:1;}
+button { background:#007bff; color:white; cursor:pointer; flex:none;}
+button:hover { background:#0056b3;}
+ul { list-style:none; padding:0;}
+li { display:flex; 
+  justify-content:space-between;
+  align-items:center;
+  padding:12px; 
+  margin-bottom:8px;
+   border-radius:6px; 
+   background:#f9f9f9;
+  }
+.remove-btn { 
+  background:red; 
+  color:white; 
+  border:none; padding:5px 8px; 
+  border-radius:6px; 
+  cursor:pointer;}
+.remove-btn:hover { background:darkred;}
+.total { font-weight:bold; text-align:right; margin-top:10px;}
+.filter { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:15px;}
+.export-buttons { display:flex; flex-wrap:wrap; gap:10px; justify-content:flex-end; margin-top:10px;}
+.chart-container { display:flex; flex-wrap:wrap; gap:20px; margin-top:20px;}
+canvas { background:#fff; border-radius:12px; padding:10px; box-shadow:0 2px 4px rgba(0,0,0,0.1); }
+.chart-wrapper { flex:1; display:flex; flex-direction:column; align-items:center; }
+.chart-description { font-size:14px; color:#555; margin-top:8px; text-align:center; }
+.notification { position:fixed; top:20px; right:20px; padding:12px 20px; border-radius:6px; color:white; font-weight:bold; }
+.success { background:#28a745;}
+.error { background:#dc3545;}
+.spinner {
+   border:4px solid #f3f3f3;
+   border-top:4px solid #007bff;
+   border-radius:50%; width:24px; height:24px; 
+   animation:spin 1s linear infinite;
+    display:inline-block; }
+@keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
+@media(max-width:768px){
+   form,.filter,.chart-container{flex-direction:column;
+   } .total{text-align:center;} .export-buttons{justify-content:center;} }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+function Notification({message,type,onClose}){
+  React.useEffect(()=>{ const t=setTimeout(onClose,2500); return ()=>clearTimeout(t); },[onClose]);
+  if(!message) return null;
+  return <div className={`notification ${type}`}>{message}</div>;
+}
+
+function ExpenseForm({onAdd,setNotification}){
+  const [name,setName]=React.useState(""); const [amount,setAmount]=React.useState("");
+  const [category,setCategory]=React.useState("Food"); const [date,setDate]=React.useState("");
+  const handleSubmit=e=>{
+    e.preventDefault();
+    if(!name||!amount||!date||amount<=0){ setNotification("Please enter valid data!", "error"); return; }
+    onAdd({id:Date.now(),name,amount:parseFloat(amount),category,date:new Date(date)});
+    setName(""); setAmount(""); setCategory("Food"); setDate("");
+    setNotification("Expense added successfully!", "success");
+  };
+  return <form onSubmit={handleSubmit}>
+    <input type="text" placeholder="Expense name" value={name} onChange={e=>setName(e.target.value)}/>
+    <input type="number" placeholder="Amount" value={amount} onChange={e=>setAmount(e.target.value)}/>
+    <select value={category} onChange={e=>setCategory(e.target.value)}>
+      <option>Food</option><option>Travel</option><option>Shopping</option><option>Bills</option><option>Other</option>
+    </select>
+    <input type="date" value={date} onChange={e=>setDate(e.target.value)}/>
+    <button type="submit">Add</button>
+  </form>;
+}
+
+function ExpenseItem({expense,onRemove}){
+  return <li>
+    <span>{expense.category} - {expense.name} : ₹{expense.amount} ({expense.date.toLocaleDateString()})</span>
+    <button className="remove-btn" onClick={()=>onRemove(expense.id)}>❌</button>
+  </li>;
+}
+
+function ExpenseList({expenses,onRemove}){
+  if(expenses.length===0) return <p className="empty">No expenses found!</p>;
+  return <ul>{expenses.map(e=><ExpenseItem key={e.id} expense={e} onRemove={onRemove}/>)}</ul>;
+}
+
+function Filter({category,setCategory,month,setMonth}){
+  return <div className="filter">
+    <select value={category} onChange={e=>setCategory(e.target.value)}>
+      <option value="All">All Categories</option>
+      <option>Food</option><option>Travel</option><option>Shopping</option><option>Bills</option><option>Other</option>
+    </select>
+    <select value={month} onChange={e=>setMonth(e.target.value)}>
+      <option value="All">All Months</option>
+      {[...Array(12).keys()].map(m=><option key={m} value={m}>{new Date(2025,m).toLocaleString('default',{month:'long'})}</option>)}
+    </select>
+  </div>;
+}
+
+function ExportButtons({expenses,setNotification}){
+  const [loading,setLoading]=React.useState(false);
+  const exportCSV=()=>{
+    if(expenses.length===0){ setNotification("No data to export!", "error"); return; }
+    setLoading(true);
+    setTimeout(()=>{
+      const headers=["Name,Amount,Category,Date"];
+      const rows=expenses.map(e=>`${e.name},${e.amount},${e.category},${e.date.toLocaleDateString()}`);
+      const csvContent=[headers,...rows].join("\n");
+      const blob=new Blob([csvContent],{type:"text/csv;charset=utf-8;"}); 
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement("a"); a.href=url; a.download="expenses.csv"; a.click(); URL.revokeObjectURL(url);
+      setLoading(false); setNotification("CSV exported successfully!", "success");
+    },500);
+  };
+  const exportExcel=()=>{
+    if(expenses.length===0){ setNotification("No data to export!", "error"); return; }
+    setLoading(true);
+    setTimeout(()=>{
+      const ws=XLSX.utils.json_to_sheet(expenses.map(e=>({Name:e.name,
+                                                        Amount:e.amount,
+                                                        Category:e.category,
+                                                        Date:e.date.toLocaleDateString()})));
+      const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,"Expenses"); XLSX.writeFile(wb,"expenses.xlsx");
+      setLoading(false); setNotification("Excel exported successfully!", "success");
+    },500);
+  };
+  return <div className="export-buttons">
+    <button onClick={exportCSV}>{loading?<span className="spinner"></span>:"⬇ CSV"}</button>
+    <button onClick={exportExcel}>{loading?<span className="spinner"></span>:"⬇ Excel"}</button>
+  </div>;
+}
+
+function ExpenseCharts({expenses}){
+  const pieRef=React.useRef(null); const barRef=React.useRef(null);
+  React.useEffect(()=>{
+    if(expenses.length===0) return;
+    const categoryTotals={}; const monthTotals={};
+    expenses.forEach(e=>{
+      categoryTotals[e.category]=(categoryTotals[e.category]||0)+e.amount; 
+      const m=new Date(e.date).getMonth(); 
+      monthTotals[m]=(monthTotals[m]||0)+e.amount; 
+    });
+
+    const pieData={ labels:Object.keys(categoryTotals),
+                     datasets:[{data:Object.values(categoryTotals), 
+                    backgroundColor:["#0088FE","#00C49F","#FFBB28","#FF8042","#A020F0"]}]};
+    const barData={ labels:Object.keys(monthTotals).map(m=>new Date(2025,m).toLocaleString('default',{month:'short'})),
+                                 datasets:[{label:"Monthly Spending", 
+                                 data:Object.values(monthTotals), 
+                                 backgroundColor:"#007bff"}]};
+
+    if(pieRef.current.chart) pieRef.current.chart.destroy();
+    if(barRef.current.chart) barRef.current.chart.destroy();
+
+    pieRef.current.chart=new Chart(pieRef.current,{type:'pie', data:pieData, options:{responsive:true}});
+    barRef.current.chart=new Chart(barRef.current,{
+      type:'bar', data:barData, options:{responsive:true, plugins:{legend:{display:false}}}});
+  },[expenses]);
+
+  return <div className="chart-container">
+    <div className="chart-wrapper">
+      <canvas ref={pieRef} height="300"></canvas>
+      <p className="chart-description">Pie chart shows total spending per category.</p>
+    </div>
+    <div className="chart-wrapper">
+      <canvas ref={barRef} height="300"></canvas>
+      <p className="chart-description">Bar chart shows spending per month.</p>
+    </div>
+  </div>;
+}
+
+function App(){
+  const [expenses,setExpenses]=React.useState(()=>{
+     const saved=localStorage.getItem("expenses"); return saved?JSON.parse(saved,(k,v)=>k==="date"?new Date(v):v):[];});
+  const [category,setCategory]=React.useState("All"); const [month,setMonth]=React.useState("All");
+  const [notification,setNotificationState]=React.useState({message:"",type:""});
+  const setNotification=(message,type)=>setNotificationState({message,type});
+
+  // Data integration: fetch initial expenses from local file or API
+  React.useEffect(()=>{
+    fetch('expenses.json')
+      .then(res=>res.json())
+      .then(data=>{
+        const formatted=data.map(e=>({...e,date:new Date(e.date)}));
+        setExpenses(prev=>[...formatted, ...prev]);
+      })
+      .catch(err=>setNotification("Failed to fetch initial data","error"));
+  }, []);
+
+  React.useEffect(()=>{localStorage.setItem("expenses",JSON.stringify(expenses));},[expenses]);
+
+  const addExpense=e=>setExpenses([...expenses,e]);
+  const removeExpense=id=>setExpenses(expenses.filter(e=>e.id!==id));
+  const filtered=expenses.filter(e=>{ const matchCat=category==="All"||e.category===category;
+  const matchMonth=month==="All"||e.date.getMonth()==month; return matchCat&&matchMonth;});
+  const total=filtered.reduce((acc,curr)=>acc+curr.amount,0);
+
+  return <div className="container">
+    <h1>💰 Expense Tracker - Data Integration</h1>
+    <ExpenseForm onAdd={addExpense} setNotification={setNotification}/>
+    <Filter category={category} setCategory={setCategory} month={month} setMonth={setMonth}/>
+    <ExpenseList expenses={filtered} onRemove={removeExpense}/>
+    <div className="total">Total ({category}, 
+      {month==="All"?"All Months":new Date(2025,month).toLocaleString('default',{month:'long'})}): ₹{total}</div>
+    <ExportButtons expenses={filtered} setNotification={setNotification}/>
+    <ExpenseCharts expenses={filtered}/>
+    <Notification message={notification.message} type={
+      notification.type} onClose={()=>setNotificationState({message:"",type:""})}/>
+  </div>;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+
+</script>
+</body>
+</html>
