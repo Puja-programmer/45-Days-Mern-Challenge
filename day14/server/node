@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>React Challenge - Sneha</title>
+
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+  
+      function Header() {
+        const name = "Sneha";
+        const title = "Aspiring Web Developer";
+
+        return (
+          <header style={{ textAlign: "center", margin: "30px 0" }}>
+            <h1>{name}</h1>
+            <h2>{title}</h2>
+          </header>
+        );
+      }
+
+      function Profile() {
+        function handleClick() {
+          alert("Thank you for visiting Sneha’s profile! 💜");
+        }
+
+        return (
+          <section style={{ textAlign: "center" }}>
+            <p>I’m Sneha, passionate about web development and coding ✨</p>
+            <button 
+              onClick={handleClick} 
+              style={{
+                padding: "10px 20px",
+                marginTop: "15px",
+                borderRadius: "8px",
+                border: "none",
+                backgroundColor: "#4CAF50",
+                color: "white",
+                fontSize: "16px",
+                cursor: "pointer"
+              }}
+            >
+              Contact Me
+            </button>
+          </section>
+        );
+      }
+
+      function Footer() {
+        return (
+          <footer style={{ textAlign: "center", marginTop: "40px", fontSize: "14px" }}>
+            <p>© 2025 Sneha. All rights reserved.</p>
+          </footer>
+        );
+      }
+
+      function App() {
+        return (
+          <div>
+            <Header />
+            <Profile />
+            <Footer />
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>
