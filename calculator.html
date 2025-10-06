@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🎀Grade Calculator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Comic Neue', cursive;
+      background: linear-gradient(to bottom right, #ffe6f0, #e0f7ff);
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    h1 {
+      color: #ff69b4;
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+
+    .container {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      width: 90%;
+      max-width: 400px;
+    }
+
+    input {
+      padding: 12px;
+      font-size: 1.1em;
+      border: 2px solid #ffc0cb;
+      border-radius: 10px;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 12px 20px;
+      background-color: #ffb6c1;
+      color: white;
+      font-size: 1em;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #ff69b4;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 1.5em;
+      color: #6a1b9a;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🌸 Grade Calculator 🌸</h1>
+  <div class="container">
+    <p>Type your score (0-100) below:</p>
+    <input type="number" id="scoreInput" min="0" max="100" placeholder="e.g. 92">
+    <button onclick="checkGrade()">✨ Calculate ✨</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    function calculateGrade(score) {
+      if (score >= 90 && score <= 100) {
+        return 'A 🌟 Excellent!';
+      } else if (score >= 80 && score < 90) {
+        return 'B 💖 Great job!';
+      } else if (score >= 70 && score < 80) {
+        return 'C 😊 Good effort!';
+      } else if (score >= 60 && score < 70) {
+        return 'D 😬 Keep trying!';
+      } else if (score >= 0 && score < 60) {
+        return 'F 💔 Don’t give up!';
+      } else {
+        return '🚫 Invalid score!';
+      }
+    }
+
+    function checkGrade() {
+      const input = document.getElementById('scoreInput').value;
+      const score = parseInt(input);
+
+      const result = calculateGrade(score);
+      document.getElementById('result').textContent = 
+        `Your grade is: ${result}`;
+    }
+  </script>
+
+</body>
+</html>
