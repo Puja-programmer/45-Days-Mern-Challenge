@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Skills</title>
+  <style>
+  :root {
+    --bg: #fff0f6;
+    --card: #ffe6f0;
+    --glass: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 182, 193, 0.4);
+    --accent1: linear-gradient(135deg, #ffafcc 0%, #ffc8dd 50%, #bde0fe 100%);
+    --text-primary: #6b2d5c;
+    --text-secondary: #a95c7b;
+    --badge-bg: #ffbad2;
+    --button-bg: #ffafcc;
+    --button-hover: #ff99bb;
+    color-scheme: light;
+    font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    color: var(--text-primary);
+    padding: 32px;
+  }
+
+  .wrap {
+    width: 100%;
+    max-width: 980px;
+  }
+
+  header {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 18px;
+  }
+
+  .logo {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    background: var(--accent1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 20px rgba(255, 182, 193, 0.6);
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 18px;
+  }
+
+  h1 {
+    font-size: 20px;
+    margin: 0;
+    color: var(--text-primary);
+  }
+
+  p.lead {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 13px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 20px;
+  }
+
+  /* main card */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--glass-border);
+    padding: 20px;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(255, 182, 193, 0.4);
+  }
+
+  .controls {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+
+  .controls select,
+  .controls button,
+  .controls input {
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid #ffc8dd;
+    background: #fff0f6;
+    color: var(--text-primary);
+    font-weight: 600;
+    transition: background 0.3s ease;
+  }
+
+  .controls button {
+    cursor: pointer;
+  }
+
+  .controls button:hover,
+  .btn-primary:hover,
+  .chip:hover {
+    background: var(--button-hover);
+    color: #fff;
+  }
+
+  ul.skills {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 10px;
+  }
+
+  li.skill {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
+    box-shadow: 0 4px 12px rgba(255, 182, 193, 0.3);
+  }
+
+  .skill .left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .badge {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    background: var(--badge-bg);
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+    color: var(--text-primary);
+    box-shadow: 0 2px 6px rgba(255, 182, 193, 0.4);
+    animation: bounce 3s ease-in-out infinite;
+  }
+
+  @keyframes bounce {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-6px);
+    }
+  }
+
+  .meta {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .meta b {
+    font-size: 14px;
+    color: var(--text-primary);
+    font-weight: 700;
+  }
+
+  .meta span {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .chip {
+    padding: 6px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    border: 1px solid rgba(255, 182, 193, 0.3);
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  /* sidebar (form) */
+  .side {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  label {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  input[type='text'],
+  select[name='prof'],
+  input[type='number'] {
+    width: 100%;
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px solid #ffc8dd;
+    background: #fff0f6;
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn-primary {
+    background: var(--button-bg);
+    border: none;
+    color: var(--text-primary);
+    padding: 10px 14px;
+    border-radius: 14px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: background 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    background: var(--button-hover);
+    color: #fff;
+  }
+
+  .small {
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  footer {
+    margin-top: 12px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-style: italic;
+  }
+
+  /* responsive */
+  @media (max-width: 880px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+    .side {
+      order: 2;
+    }
+  }
+</style>
+
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">SK</div>
+      <div>
+        <h1>Skills Set</h1>
+ 
+      </div>
+    </header>
+
+    <div class="grid">
+      <div class="card">
+        <div class="controls">
+          <select id="filterProf" title="Filter by proficiency">
+            <option value="all">All Proficiencies</option>
+            <option value="Advanced">Advanced</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Beginner">Beginner</option>
+          </select>
+
+          <select id="sortBy">
+            <option value="none">No Sort</option>
+            <option value="name-asc">Name A → Z</option>
+            <option value="name-desc">Name Z → A</option>
+            <option value="prof">Proficiency (Adv → Int → Beg)</option>
+          </select>
+
+          <button id="btnShowFormatted">Show Formatted Array (console)</button>
+          <button id="btnReset">Reset</button>
+        </div>
+
+        <ul id="skillsList" class="skills" aria-live="polite">
+          <!-- JS will populate -->
+        </ul>
+
+        <footer>Try adding skills </footer>
+      </div>
+
+      <aside class="side">
+        <div class="card">
+          <label>Add new skill</label>
+          <input id="inpName" type="text" placeholder="Skill name (e.g. React)" />
+          <select id="inpProf" name="prof">
+            <option value="Beginner">Beginner</option>
+            <option value="Intermediate" selected>Intermediate</option>
+            <option value="Advanced">Advanced</option>
+          </select>
+          <div class="form-row">
+            <input id="inpYears" type="number" step="0.5" placeholder="Years (e.g. 1.5)" />
+            <button id="btnAdd" class="btn-primary">Add Skill</button>
+          </div>
+         
+        </div>
+
+        <div class="card">
+          <label>Quick actions</label>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
+            <div style="display:flex;gap:8px">
+              <button class="chip" id="addReact">Add React (Intermediate)</button>
+              <button class="chip" id="addNode">Add Node.js (Intermediate)</button>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="chip" id="showAdvanced">Show Advanced</button>
+              <button class="chip" id="countLevels">Count Levels</button>
+            </div>
+          </div>
+          <div id="quickOutput" class="small" style="margin-top:10px"></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    // Initial skills array (challenge sample + extras)
+    let skills = [
+      { name: "HTML", proficiency: "Intermediate", years: 2 },
+      { name: "CSS", proficiency: "Advanced", years: 3 },
+      { name: "JavaScript", proficiency: "Beginner", years: 0.5 }
+    ];
+
+    // Utility: format for display and for console
+    function formatSkill(s){
+      return `${s.name} (${s.proficiency})`;
+    }
+
+    function render(list){
+      const ul = document.getElementById('skillsList');
+      ul.innerHTML = '';
+      list.forEach(s => {
+        const li = document.createElement('li'); li.className = 'skill';
+        li.innerHTML = `
+          <div class="left">
+            <div class="badge">${s.name.slice(0,2).toUpperCase()}</div>
+            <div class="meta"><b>${s.name}</b><span>${s.proficiency} • ${s.years ?? '—'} yrs</span></div>
+          </div>
+          <div class="actions">
+            <button class="chip" onclick="promote('${s.name.replace(/'/g,'\'')}')">Promote</button>
+            <button class="chip" onclick="removeSkill('${s.name.replace(/'/g,'\'')}')">Remove</button>
+          </div>`;
+        ul.appendChild(li);
+      });
+    }
+
+    // initial render
+    render(skills);
+
+    // controls
+    document.getElementById('btnShowFormatted').addEventListener('click', ()=>{
+      const out = skills.map(formatSkill);
+      console.log(out);
+      alert('Formatted array logged to console. (Open DevTools → Console)');
+    });
+
+    document.getElementById('filterProf').addEventListener('change', ()=>{ applyFilters(); });
+    document.getElementById('sortBy').addEventListener('change', ()=>{ applyFilters(); });
+
+    document.getElementById('btnReset').addEventListener('click', ()=>{
+      skills = [
+        { name: "HTML", proficiency: "Intermediate", years: 2 },
+        { name: "CSS", proficiency: "Advanced", years: 3 },
+        { name: "JavaScript", proficiency: "Beginner", years: 0.5 }
+      ];
+      document.getElementById('filterProf').value = 'all';
+      document.getElementById('sortBy').value = 'none';
+      render(skills);
+      document.getElementById('quickOutput').textContent = '';
+    });
+
+    function applyFilters(){
+      const prof = document.getElementById('filterProf').value;
+      const sort = document.getElementById('sortBy').value;
+      let list = skills.slice();
+      if(prof !== 'all') list = list.filter(s => s.proficiency === prof);
+
+      if(sort === 'name-asc') list.sort((a,b)=> a.name.localeCompare(b.name));
+      if(sort === 'name-desc') list.sort((a,b)=> b.name.localeCompare(a.name));
+      if(sort === 'prof'){
+        const order = { 'Advanced': 0, 'Intermediate': 1, 'Beginner': 2 };
+        list.sort((a,b)=> (order[a.proficiency]||9) - (order[b.proficiency]||9) || a.name.localeCompare(b.name));
+      }
+
+      render(list);
+    }
+
+    // add skill
+    document.getElementById('btnAdd').addEventListener('click', ()=>{
+      const name = (document.getElementById('inpName').value || '').trim();
+      const prof = document.getElementById('inpProf').value;
+      const yrs = parseFloat(document.getElementById('inpYears').value) || 0;
+      if(!name){ alert('Please enter a skill name'); return; }
+      skills.push({ name, proficiency: prof, years: yrs });
+      document.getElementById('inpName').value=''; document.getElementById('inpYears').value='';
+      applyFilters();
+    });
+
+    // quick actions
+    document.getElementById('addReact').addEventListener('click', ()=>{ skills.push({name:'React', proficiency:'Intermediate', years:1}); applyFilters(); });
+    document.getElementById('addNode').addEventListener('click', ()=>{ skills.push({name:'Node.js', proficiency:'Intermediate', years:1}); applyFilters(); });
+
+    document.getElementById('showAdvanced').addEventListener('click', ()=>{
+      const advanced = skills.filter(s=>s.proficiency==='Advanced').map(formatSkill);
+      document.getElementById('quickOutput').textContent = advanced.join(' | ') || 'No advanced skills';
+    });
+
+    document.getElementById('countLevels').addEventListener('click', ()=>{
+      const counts = skills.reduce((acc,s)=>{ acc[s.proficiency] = (acc[s.proficiency]||0)+1; return acc; },{});
+      document.getElementById('quickOutput').textContent = JSON.stringify(counts);
+    });
+
+    // promote skill (simple action to change level)
+    function promote(name){
+      const idx = skills.findIndex(s=>s.name === name);
+      if(idx === -1) return;
+      const order = ['Beginner','Intermediate','Advanced'];
+      const cur = skills[idx].proficiency || 'Beginner';
+      const next = order[Math.min(order.indexOf(cur)+1, order.length-1)];
+      skills[idx].proficiency = next;
+      applyFilters();
+    }
+
+    function removeSkill(name){
+      skills = skills.filter(s=>s.name !== name);
+      applyFilters();
+    }
+
+    // expose small functions to global for onclick in template (safe for demo)
+    window.promote = promote; window.removeSkill = removeSkill;
+
+    // initial console log of formatted array (answer to challenge)
+    console.log('Formatted output (sample):', skills.map(formatSkill));
+  </script>
+</body>
+</html>
