@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Project Cards</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    /* Import clean modern font */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+    body {
+      margin: 0;
+      padding: 50px 20px;
+      font-family: 'Inter', sans-serif;
+      background: #f5f7fa;
+      color: #2c3e50;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    h1 {
+      font-weight: 600;
+      font-size: 3rem;
+      margin-bottom: 8px;
+      color: #222;
+      letter-spacing: 1.2px;
+      user-select: none;
+    }
+
+    p.count {
+      font-size: 1.1rem;
+      color: #555;
+      margin-bottom: 48px;
+      user-select: none;
+    }
+
+    .projects {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+      width: 100%;
+      max-width: 960px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 32px 28px;
+      box-shadow:
+        0 10px 20px rgba(0, 0, 0, 0.07),
+        0 4px 8px rgba(0, 0, 0, 0.05);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+      outline-offset: 4px;
+    }
+
+    .card:hover,
+    .card:focus-visible {
+      transform: translateY(-8px);
+      box-shadow:
+        0 25px 40px rgba(0, 0, 0, 0.12),
+        0 10px 20px rgba(0, 0, 0, 0.08);
+      outline: none;
+    }
+
+    .card h3 {
+      margin: 0 0 18px 0;
+      font-weight: 600;
+      font-size: 1.9rem;
+      color: #1e2a38;
+      line-height: 1.2;
+    }
+
+    .card p {
+      flex-grow: 1;
+      font-size: 1.05rem;
+      line-height: 1.5;
+      color: #4a5568;
+      margin-bottom: 32px;
+      user-select: text;
+    }
+
+    .learn-more-btn {
+      background: #2563eb; /* nice blue */
+      color: white;
+      border: none;
+      border-radius: 28px;
+      padding: 12px 28px;
+      font-weight: 600;
+      font-size: 1rem;
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      cursor: pointer;
+      align-self: flex-start;
+      user-select: none;
+    }
+
+    .learn-more-btn:hover,
+    .learn-more-btn:focus-visible {
+      background: #1d4ed8;
+      transform: scale(1.06);
+      outline: none;
+    }
+
+    .delete-btn {
+      background-color: #ef4444; /* red */
+      color: white;
+      border: none;
+      border-radius: 28px;
+      padding: 12px 20px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1rem;
+      box-shadow: 0 6px 16px rgba(239, 68, 68, 0.35);
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      user-select: none;
+      align-self: flex-start;
+    }
+
+    .delete-btn:hover,
+    .delete-btn:focus-visible {
+      background-color: #b91c1c;
+      transform: scale(1.06);
+      outline: none;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* Modal styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(30, 41, 50, 0.65);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      backdrop-filter: blur(4px);
+      user-select: none;
+    }
+
+    .modal-content {
+      background: #fff;
+      border-radius: 20px;
+      max-width: 420px;
+      width: 90%;
+      padding: 40px 32px 48px;
+      box-shadow: 0 25px 45px rgba(0, 0, 0, 0.15);
+      position: relative;
+      text-align: center;
+      user-select: text;
+    }
+
+    .modal-content h2 {
+      margin: 0 0 24px 0;
+      font-weight: 700;
+      font-size: 2rem;
+      color: #1e2a38;
+      line-height: 1.2;
+    }
+
+    .modal-content p {
+      font-size: 1.1rem;
+      color: #4a5568;
+      line-height: 1.6;
+      margin-bottom: 36px;
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      background: transparent;
+      border: none;
+      font-size: 2.6rem;
+      color: #718096;
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.3s ease;
+    }
+
+    .modal-close-btn:hover,
+    .modal-close-btn:focus-visible {
+      color: #2d3748;
+      outline: none;
+    }
+
+    /* Form styles */
+    form {
+      margin-bottom: 48px;
+      width: 100%;
+      max-width: 960px;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    input, textarea {
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 1rem;
+      flex: 1 1 280px;
+      font-family: 'Inter', sans-serif;
+      transition: border-color 0.3s ease;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 5px rgba(37, 99, 235, 0.5);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 64px;
+    }
+
+    button.add-project-btn {
+      background: #10b981;
+      border: none;
+      border-radius: 28px;
+      padding: 12px 28px;
+      font-weight: 600;
+      font-size: 1rem;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      user-select: none;
+      flex: 0 0 auto;
+      align-self: center;
+    }
+
+    button.add-project-btn:hover,
+    button.add-project-btn:focus-visible {
+      background: #059669;
+      transform: scale(1.05);
+      outline: none;
+    }
+
+    @media (max-width: 500px) {
+      .card {
+        padding: 24px 20px;
+      }
+      .learn-more-btn, .delete-btn {
+        padding: 10px 16px;
+        font-size: 0.95rem;
+      }
+      .modal-content {
+        padding: 32px 24px 40px;
+      }
+      form {
+        flex-direction: column;
+        gap: 12px;
+      }
+      button.add-project-btn {
+        width: 100%;
+      }
+      .button-group {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    function ProjectCard({ title, description, onLearnMore, onDelete }) {
+      return (
+        <div
+          className="card"
+          tabIndex={0}
+          role="button"
+          onClick={onLearnMore}
+          onKeyDown={e => e.key === "Enter" && onLearnMore()}
+          aria-label={`Open project details: ${title}`}
+        >
+          <h3>{title}</h3>
+          <p>{description}</p>
+          <div className="button-group">
+            <button
+              className="learn-more-btn"
+              onClick={e => {
+                e.stopPropagation();
+                onLearnMore();
+              }}
+              aria-label={`Learn more about ${title}`}
+            >
+              Learn More
+            </button>
+            <button
+              className="delete-btn"
+              onClick={e => {
+                e.stopPropagation();
+                onDelete();
+              }}
+              aria-label={`Delete project ${title}`}
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    function Modal({ title, description, onClose }) {
+      return (
+        <div
+          className="modal-overlay"
+          onClick={onClose}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-title"
+        >
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <button
+              className="modal-close-btn"
+              onClick={onClose}
+              aria-label="Close modal"
+            >
+              &times;
+            </button>
+            <h2 id="modal-title">{title}</h2>
+            <p>{description}</p>
+          </div>
+        </div>
+      );
+    }
+
+    function App() {
+      const [projects, setProjects] = useState(() => {
+        // Load projects from localStorage or fallback to default projects
+        const saved = localStorage.getItem("projects");
+        return saved
+          ? JSON.parse(saved)
+          : [
+              {
+                id: 1,
+                title: "Portfolio Website",
+                description:
+                  "A clean, fast, and modern portfolio built to showcase my projects and skills.",
+              },
+              {
+                id: 2,
+                title: "Smart Calculator",
+                description:
+                  "An intuitive calculator app with history and memory functions for everyday use.",
+              },
+              {
+                id: 3,
+                title: "Weather Dashboard",
+                description:
+                  "Real-time weather updates with a sleek interface and location-based forecasts.",
+              },
+            ];
+      });
+
+      // Save projects to localStorage whenever they change
+      useEffect(() => {
+        localStorage.setItem("projects", JSON.stringify(projects));
+      }, [projects]);
+
+      const [modalData, setModalData] = useState(null);
+      const [newTitle, setNewTitle] = useState("");
+      const [newDescription, setNewDescription] = useState("");
+
+      const openModal = project => setModalData(project);
+      const closeModal = () => setModalData(null);
+
+      const addProject = e => {
+        e.preventDefault();
+        if (!newTitle.trim() || !newDescription.trim()) return;
+
+        const newProject = {
+          id: Date.now(),
+          title: newTitle.trim(),
+          description: newDescription.trim(),
+        };
+
+        setProjects(prev => [...prev, newProject]);
+        setNewTitle("");
+        setNewDescription("");
+      };
+
+      const deleteProject = id => {
+        setProjects(prevProjects => prevProjects.filter(project => project.id !== id));
+        if (modalData?.id === id) {
+          closeModal();
+        }
+      };
+
+      return (
+        <>
+          <h1>My Projects</h1>
+          <p className="count">Total Projects: {projects.length}</p>
+
+          <form onSubmit={addProject}>
+            <input
+              type="text"
+              placeholder="Project Title"
+              value={newTitle}
+              onChange={e => setNewTitle(e.target.value)}
+              aria-label="Project Title"
+              required
+            />
+            <textarea
+              placeholder="Project Description"
+              value={newDescription}
+              onChange={e => setNewDescription(e.target.value)}
+              aria-label="Project Description"
+              required
+            />
+            <button type="submit" className="add-project-btn">
+              Add Project
+            </button>
+          </form>
+
+          <div className="projects">
+            {projects.map(project => (
+              <ProjectCard
+                key={project.id}
+                title={project.title}
+                description={project.description}
+                onLearnMore={() => openModal(project)}
+                onDelete={() => deleteProject(project.id)}
+              />
+            ))}
+          </div>
+
+          {modalData && (
+            <Modal
+              title={modalData.title}
+              description={modalData.description}
+              onClose={closeModal}
+            />
+          )}
+        </>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<App />);
+  </script>
+</body>
+</html>
